@@ -5,17 +5,16 @@ import (
 	
 	"github.com/tariel-x/tsc/base"
 	"github.com/go-redis/redis"
-	"github.com/satori/go.uuid"
 )
 
 //go:generate tsc main.go DataIn DataOut
 
 type DataIn struct {
-	NewText string `json:"newText"`
+	ID string `json:"id"`
 }
 
 type DataOut struct {
-	ID string `json:"id"`
+	Text string `json:"text"`
 }
 
 func main() {
@@ -39,9 +38,8 @@ func main() {
 	
 	err = s.Liftoff(
 		func(in DataIn) (DataOut, error) {
-			key := uuid.NewV4()
-			err := client.Set(key.String(), in.Text, 0).Err()
-			return DataOut{key.String()}, err
+			text, err := client.Get(in.ID).Result()
+			return DataOut{text}, err
 		},
 	)
 	base.Die(err)
