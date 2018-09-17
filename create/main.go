@@ -2,10 +2,10 @@ package main
 
 import (
 	"os"
-	
-	"github.com/tariel-x/tsc/base"
+
 	"github.com/go-redis/redis"
 	"github.com/satori/go.uuid"
+	"github.com/tariel-x/tsc/base"
 )
 
 //go:generate tsc main.go DataIn DataOut
@@ -24,10 +24,10 @@ func main() {
 		Password: "",
 		DB:       0,
 	})
-	
+
 	_, err := client.Ping().Result()
 	base.Die(err)
-	
+
 	s, err := New(
 		os.Getenv("RMQ"),
 		os.Getenv("RMQ_API"),
@@ -36,11 +36,11 @@ func main() {
 		"view",
 	)
 	base.Die(err)
-	
+
 	err = s.Liftoff(
 		func(in DataIn) (DataOut, error) {
 			key := uuid.NewV4()
-			err := client.Set(key.String(), in.Text, 0).Err()
+			err := client.Set(key.String(), in.NewText, 0).Err()
 			return DataOut{key.String()}, err
 		},
 	)
